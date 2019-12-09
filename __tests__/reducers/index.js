@@ -34,6 +34,36 @@ describe('Karaoke App', () => {
     });
   });
 
+  it('Update state on receive song', () => {
+  const action = actions.receiveSong('kiss', 'prince', 1, ['you don\'t have to be beautiful', 'to turn me on']);
+  const newObject = {
+    isFetching: false,
+    title: action.title,
+    artist: action.artist,
+    songId: action.songId,
+    receivedAt: action.receivedAt,
+    songArray: action.songArray,
+    arrayPosition: 0
+  };
+  expect(lyricChangeReducer(initialState.songsById, action)[action.songId])
+  .toEqual(newObject);
+});
+
+  it('Update state on receive song', () => {
+    const action = actions.receiveSong('kiss', 'prince', 1, ['you don\'t have to be beautiful', 'to turn me on']);
+    const newObject = {
+      isFetching: false,
+      title: action.title,
+      artist: action.artist,
+      songId: action.songId,
+      receivedAt: action.receivedAt,
+      songArray: action.songArray,
+      arrayPosition: 0
+    };
+    expect(lyricChangeReducer(initialState.songsById, action)[action.songId])
+    .toEqual(newObject);
+  });
+
   describe('songChangeReducer', () => {
     it('Should accept and return initial state.', () => {
       expect(songChangeReducer(initialState, { type: null })).toEqual(initialState);

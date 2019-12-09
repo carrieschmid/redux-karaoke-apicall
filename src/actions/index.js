@@ -22,6 +22,31 @@ export const nextLyric = (currentSongId) => ({
     songId: localSongId
   });
   
+  export function fetchLyrics(title, artist, musicMatchId, localSongId, dispatch) {
+    return fetch('http://api.musixmatch.com/ws/1.1/track.lyrics.get?track_id=' + musicMatchId + '&apikey=271afdce6ff3866141de1b9f7477fd64').then(
+      response => response.json(),
+      error => console.log('An error occurred.', error)
+    ).then(function(json) {
+      if (json.message.body.lyrics) {
+        let lyrics = json.message.body.lyrics.lyrics_body;
+        lyrics = lyrics.replace('"', '');
+        const songArray = lyrics.split(/\n/g).filter(entry => entry!="");
+        dispatch(receiveSong(title, artist, localSongId, songArray));
+        dispatch(changeSong(localSongId));
+      } else {
+        console.log('We couldn\'t locate lyrics for this song!');
+      }
+    });
+  }
+
+  export const receiveSong = (title, artist, songId, songArray) => ({
+    type: types.RECEIVE_SONG,
+    songId,
+    title,
+    artist,
+    songArray,
+    receivedAt: Date.now()
+  });
 
   // Takes the 'title' from our form as argument:
   export function fetchSongId(title) {
@@ -46,13 +71,22 @@ export const nextLyric = (currentSongId) => ({
       // The return value from first then() block (API response) is passed to second
       // .then() block as parameter 'json':
           .then(function(json){
-
-      // Yells excitedly, and prints API response to console.
-      // We'll add more code here later, after we confirm responses are
-      // being received correctly.
-              console.log('CHECK OUT THIS SWEET API RESPONSE:', json)
+            if (json.message.body.track_list.length > 0) {
+              const musicMatchId = json.message.body.track_list[0].track.track_id;
+              const artist = json.message.body.track_list[0].track.artist_name;
+              console.log(artist);
+              const title = json.message.body.track_list[0].track.track_name;
+              console.log(title);
+              fetchLyrics(title, artist, musicMatchId, localSongId, dispatch);
+            } else {
+              console.log('We couldn\'t locate a song under that ID!');
+            }
           });
+
+          
           
     
       };
+
+      
   }

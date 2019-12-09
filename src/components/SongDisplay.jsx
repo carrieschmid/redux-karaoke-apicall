@@ -40,14 +40,25 @@ SongDisplay.propTypes = {
 };
 
 const mapStateToProps = state => {
+  let info;
   const song = state.songsById[state.currentSongId];
-  const songInfo = {
+//   Depending on network speed, the component may attempt to display the new song's information before everything's done fetching, parsing, and saving to Redux. But remember, we included an isFetching property in each song. This property is only made false when everything is complete.So, to avoid this error we just need to wait until the song's isFetching property is false before rendering its data. We can add a conditional that checks isFetching. Even if you don't experience this error, you should still add this code to safeguard against similar async issues in the future!
+  if (!state.songsById[state.currentSongId].isFetching) {
+    info = {
     id: song.songId,
     artist: song.artist,
     title: song.title,
     songArray: song.songArray,
     arrayPosition: song.arrayPosition
   };
+  } else {
+    info = {
+      artist:'',
+      title: '',
+      songArray: '',
+      arrayPosition: ''
+    };
+  }
   return {
     song: songInfo
   };
